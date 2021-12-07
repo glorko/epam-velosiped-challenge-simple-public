@@ -1,84 +1,54 @@
-  Skip to content
-    Search or jump to…
-    Pull requests
-    Issues
-    Marketplace
-    Explore
+name: Java CI with Maven
 
-    @glorko
-    aabarmin
-    /
-    epam-velosiped-challenge-simple-public
-    Public
-    1
-    01
-    Code
-    Issues
-    Pull requests
-    Actions
-    Projects
-    Wiki
-    Security
-    Insights
-    epam-velosiped-challenge-simple-public/.github/workflows/maven.yml
-    @aabarmin
-    aabarmin Update maven.yml
-    Latest commit 36b2df7 27 seconds ago
-    History
-    1 contributor
-    41 lines (33 sloc)  862 Bytes
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
 
-  name: Java CI with Maven
+jobs:
+  build:
 
-  on:
-    push:
-      branches: [ main ]
-    pull_request:
-      branches: [ main ]
-    workflow_dispatch:
+    runs-on: ubuntu-latest
 
-  jobs:
-    build:
+    steps:
+      - uses: actions/checkout@v2
 
-      runs-on: ubuntu-latest
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+          cache: maven
 
-      steps:
-        - uses: actions/checkout@v2
+      - name: Caching Apache Maven repository
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
-        - name: Set up JDK 11
-          uses: actions/setup-java@v2
-          with:
-            java-version: '11'
-            distribution: 'adopt'
-            cache: maven
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
 
-        - name: Caching Apache Maven repository
-          uses: actions/cache@v1
-          with:
-            path: ~/.m2/repository
-            key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-            restore-keys: |
-              ${{ runner.os }}-maven-
-
-        - name: Build with Maven
-          run: mvn -B package --file pom.xml
-
-        - name: Uploading test results
-          if: always()
-          uses: actions/upload-artifact@v2
-          with:
-            name: test-results
-            path: ./target/surefire-reports
-    © 2021 GitHub, Inc.
-    Terms
-    Privacy
-    Security
-    Status
-    Docs
-    Contact GitHub
-    Pricing
-    API
-    Training
-    Blog
-    About
-    Loading complete
+      - name: Uploading test results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: ./target/surefire-reports
+  © 2021 GitHub, Inc.
+  Terms
+  Privacy
+  Security
+  Status
+  Docs
+  Contact GitHub
+  Pricing
+  API
+  Training
+  Blog
+  About
+  Loading complete
